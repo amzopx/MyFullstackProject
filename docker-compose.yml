@@ -1,0 +1,35 @@
+# docker-compose.yml 是一种用于定义和运行多容器 Docker 应用程序的文件
+# version 指定了文件格式的版本
+version: '3.8'
+
+# services 定义了我们应用包含的各个服务（容器）
+services:
+  # 'db' 是我们给数据库服务起的名字
+  db:
+    # image 指定了我们要使用的 Docker 镜像。'postgres:15' 表示使用官方的 PostgreSQL 15 版本。
+    image: postgres:15
+    # container_name 是容器启动后的名字，方便我们识别
+    container_name: my_postgres_db
+    # restart: always 确保 Docker 重启时，这个容器也会自动重启
+    restart: always
+    # environment 定义了容器启动时需要的环境变量
+    environment:
+      # POSTGRES_USER: 设置数据库的超级用户名
+      POSTGRES_USER: myuser
+      # POSTGRES_PASSWORD: 设置数据库的密码（在真实项目中请使用更复杂的密码）
+      POSTGRES_PASSWORD: mypassword
+      # POSTGRES_DB: 容器启动时自动创建的数据库名称
+      POSTGRES_DB: myappdb
+    # ports 将容器的端口映射到主机的端口
+    # "5432:5432" 表示将我们电脑的 5432 端口连接到容器内部的 5432 端口（PostgreSQL默认端口）
+    # 这样我们的 FastAPI 应用就可以通过访问本机的 5432 端口来连接数据库了
+    ports:
+      - "5432:5432"
+    # volumes 将主机上的一个目录挂载到容器内部，用于持久化存储数据
+    # 这可以确保即使我们删除了容器，数据库的数据也不会丢失
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+# volumes 定义了上面使用的命名卷，让 Docker 来管理它
+volumes:
+  postgres_data:
